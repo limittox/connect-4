@@ -5,7 +5,7 @@ function Game() {
 
   return (
     <>
-      <div>
+      <div className="min-h-screen bg-red-500">
         <Header />
         <Board />
       </div>

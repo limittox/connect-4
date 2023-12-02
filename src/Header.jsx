@@ -1,6 +1,6 @@
 const Header = () => {
     return (
-        <div className="flex justify-center text-4xl pb-6">
+        <div className="text-center text-yellow-400 text-[65px] font-light font-['Inter'] cursor-pointer">
             connect-4
         </div>
     )
