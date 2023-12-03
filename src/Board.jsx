@@ -17,14 +17,12 @@ const Board = () => {
   const [playerMove, setPlayerMove] = useState(FIRST_PLAYER);
   const [winner, setWinner] = useState(null);
 
-  useEffect(() => {
-    console.log(winner);
-  }, [winner]);
-
   const checkWin = (slots) => {
+    let slotFilledCount = 0;
     for (let i = 0; i < COLUMNS; i++) {
       for (let j = 0; j < ROWS; j++) {
         if (slots[i][j] !== null) {
+          slotFilledCount++;
           if (
             j + 3 < ROWS &&
             slots[i][j] === slots[i][j + 1] &&
@@ -62,6 +60,11 @@ const Board = () => {
         }
       }
     }
+
+    if (slotFilledCount === ROWS * COLUMNS) {
+      return "Draw";
+    }
+
     return null;
   };
 
@@ -81,17 +84,19 @@ const Board = () => {
   };
 
   const handleResetClick = () => {
-    setSlots(Array(COLUMNS)
-    .fill(null)
-    .map(() => Array(ROWS).fill(null)));
+    setSlots(
+      Array(COLUMNS)
+        .fill(null)
+        .map(() => Array(ROWS).fill(null))
+    );
     setPlayerMove(FIRST_PLAYER);
     setWinner(null);
   };
 
   return (
-    <div className="flex justify-items-center items-center gap-4 mt-8 ml-8 mr-8  grid grid-rows-[max-content_1fr]">
+    <div className="flex justify-items-center items-center gap-4 mt-8 ml-8 mr-8 grid grid-rows-[max-content_1fr]">
       <TurnIndicator turn={playerMove} />
-      <div className="grid grid-cols-7 w-140 h-120">
+      <div className="grid grid-cols-7 md:w-140 md:h-120">
         {slots.map((row, i) => (
           <Column
             key={i}
