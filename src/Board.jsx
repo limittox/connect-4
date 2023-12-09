@@ -17,6 +17,13 @@ const Board = () => {
   const [playerMove, setPlayerMove] = useState(FIRST_PLAYER);
   const [winner, setWinner] = useState(null);
 
+  useEffect(() => {
+    if (playerMove === SECOND_PLAYER) {
+      computerMove()
+    }
+    console.log(slots)
+  }, [slots])
+
   const checkWin = (slots) => {
     let slotFilledCount = 0;
     for (let i = 0; i < COLUMNS; i++) {
@@ -67,6 +74,86 @@ const Board = () => {
 
     return null;
   };
+
+  const minimax = (board, depth, alpha, beta, maximizingPlayer) => {
+    const winner = checkWin(board);
+    if (depth === 0 || winner) {
+      if (winner === SECOND_PLAYER) return 100;
+      else if (winner === FIRST_PLAYER) return -100;
+      else return 0; // Draw or depth limit
+    }
+  
+    if (maximizingPlayer) {
+      let maxEval = -Infinity;
+      for (let i = 0; i < COLUMNS; i++) {
+        const newBoard = makeTempMove(board, i, SECOND_PLAYER);
+        if (newBoard) {
+          const evaluation = minimax(newBoard, depth - 1, alpha, beta, false);
+          maxEval = Math.max(maxEval, evaluation);
+          alpha = Math.max(alpha, evaluation);
+          if (beta <= alpha) break;
+        }
+      }
+      return maxEval;
+    } else {
+      let minEval = Infinity;
+      for (let i = 0; i < COLUMNS; i++) {
+        const newBoard = makeTempMove(board, i, FIRST_PLAYER);
+        if (newBoard) {
+          const evaluation = minimax(newBoard, depth - 1, alpha, beta, true);
+          minEval = Math.min(minEval, evaluation);
+          beta = Math.min(beta, evaluation);
+          if (beta <= alpha) break;
+        }
+      }
+      return minEval;
+    }
+  };
+  
+  const makeTempMove = (board, col, player) => {
+    const newBoard = board.map(row => [...row]);
+    for (let j = ROWS - 1; j >= 0; j--) {
+      if (newBoard[col][j] === null) {
+        newBoard[col][j] = player;
+        return newBoard;
+      }
+    }
+    return null; // Column is full
+  };
+  
+  const computerMove = () => {
+    let bestScore = -Infinity;
+    let bestMove = null;
+  
+    for (let i = 0; i < COLUMNS; i++) {
+      const newBoard = makeTempMove(slots, i, SECOND_PLAYER);
+      if (newBoard) {
+        const score = minimax(newBoard, 4, -Infinity, Infinity, false); // Adjust depth as needed
+        if (score > bestScore) {
+          bestScore = score;
+          bestMove = i;
+        }
+      }
+    }
+  
+    if (bestMove !== null) {
+      makeMove(bestMove, SECOND_PLAYER);
+    }
+  };
+
+  const makeMove = (move, player) => {
+    const newBoard = slots.map((row) => [...row]);
+    const newSlots = newBoard[move];
+    for (let i = ROWS - 1; i >= 0; i--) {
+      if (newSlots[i] === null) {
+        newSlots[i] = player;
+        setSlots(newBoard)
+        setWinner(checkWin(newBoard))
+        setPlayerMove(playerMove === FIRST_PLAYER ? SECOND_PLAYER : FIRST_PLAYER)
+        break
+      }
+    }
+  }
 
   const handleClick = (i) => {
     if (!winner) {
