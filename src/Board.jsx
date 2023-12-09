@@ -94,10 +94,10 @@ const Board = () => {
   };
 
   return (
-    <div className="flex justify-items-center items-center gap-4 mt-8 ml-8 mr-8 grid grid-rows-[max-content_1fr]">
+    <div className="flex justify-items-center items-center gap-4 mt-8 ml-8 mr-8 grid auto-rows-auto">
       <TurnIndicator turn={playerMove} />
       <div className="grid grid-cols-7 md:w-140 md:h-120">
-        {slots.map((row, i) => (
+        {slots.map((_, i) => (
           <Column
             key={i}
             colIndex={i}
