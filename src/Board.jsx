@@ -166,12 +166,12 @@ const Board = ({ playMode }) => {
       for (let j = ROWS - 1; j >= 0; j--) {
         if (newSlots[i][j] === null) {
           newSlots[i][j] = playerMove;
+          setSlots(newSlots);
+          setPlayerMove(playerMove === FIRST_PLAYER ? SECOND_PLAYER : FIRST_PLAYER);
+          setWinner(checkWin(newSlots));
           break;
         }
       }
-      setSlots(newSlots);
-      setPlayerMove(playerMove === FIRST_PLAYER ? SECOND_PLAYER : FIRST_PLAYER);
-      setWinner(checkWin(newSlots));
     }
   };
 
