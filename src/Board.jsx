@@ -7,8 +7,9 @@ const ROWS = 6;
 const COLUMNS = 7;
 const FIRST_PLAYER = "X";
 const SECOND_PLAYER = "O";
+const MAX_DEPTH = 6;
 
-const Board = () => {
+const Board = ({ playMode }) => {
   const [slots, setSlots] = useState(
     Array(COLUMNS)
       .fill(null)
@@ -16,13 +17,14 @@ const Board = () => {
   );
   const [playerMove, setPlayerMove] = useState(FIRST_PLAYER);
   const [winner, setWinner] = useState(null);
+  const columnOrder = [3, 2, 4, 1, 5, 0, 6];
+  
 
   useEffect(() => {
-    if (playerMove === SECOND_PLAYER) {
+    if (playMode === "singlePlayer" && playerMove === SECOND_PLAYER && !checkWin(slots)) {
       computerMove()
     }
-    console.log(slots)
-  }, [slots])
+  }, [slots, playerMove, playMode]);
 
   const checkWin = (slots) => {
     let slotFilledCount = 0;
@@ -78,15 +80,16 @@ const Board = () => {
   const minimax = (board, depth, alpha, beta, maximizingPlayer) => {
     const winner = checkWin(board);
     if (depth === 0 || winner) {
-      if (winner === SECOND_PLAYER) return 100;
-      else if (winner === FIRST_PLAYER) return -100;
-      else return 0; // Draw or depth limit
+      let score = 0;
+      if (winner === SECOND_PLAYER) score = 10000000;
+      else if (winner === FIRST_PLAYER) score = -10000000;
+      return score - (MAX_DEPTH - depth + 1); // Draw or depth limit
     }
   
     if (maximizingPlayer) {
       let maxEval = -Infinity;
       for (let i = 0; i < COLUMNS; i++) {
-        const newBoard = makeTempMove(board, i, SECOND_PLAYER);
+        const newBoard = makeTempMove(board, columnOrder[i], SECOND_PLAYER);
         if (newBoard) {
           const evaluation = minimax(newBoard, depth - 1, alpha, beta, false);
           maxEval = Math.max(maxEval, evaluation);
@@ -98,7 +101,7 @@ const Board = () => {
     } else {
       let minEval = Infinity;
       for (let i = 0; i < COLUMNS; i++) {
-        const newBoard = makeTempMove(board, i, FIRST_PLAYER);
+        const newBoard = makeTempMove(board, columnOrder[i], FIRST_PLAYER);
         if (newBoard) {
           const evaluation = minimax(newBoard, depth - 1, alpha, beta, true);
           minEval = Math.min(minEval, evaluation);
@@ -124,14 +127,16 @@ const Board = () => {
   const computerMove = () => {
     let bestScore = -Infinity;
     let bestMove = null;
-  
+
     for (let i = 0; i < COLUMNS; i++) {
-      const newBoard = makeTempMove(slots, i, SECOND_PLAYER);
+      let move = columnOrder[i]
+      const newBoard = makeTempMove(slots, move, SECOND_PLAYER);
       if (newBoard) {
-        const score = minimax(newBoard, 4, -Infinity, Infinity, false); // Adjust depth as needed
+        const score = minimax(newBoard, MAX_DEPTH, -Infinity, Infinity, false); // Adjust depth as needed
+        console.log(`Move: ${move} Score: ${score}`)
         if (score > bestScore) {
           bestScore = score;
-          bestMove = i;
+          bestMove = move;
         }
       }
     }
