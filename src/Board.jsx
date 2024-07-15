@@ -22,7 +22,7 @@ const Board = ({ playMode }) => {
 
   useEffect(() => {
     if (playMode === "singlePlayer" && playerMove === SECOND_PLAYER && !checkWin(slots)) {
-      computerMove()
+      setTimeout(() => computerMove(), 300);
     }
   }, [slots, playerMove, playMode]);
 
